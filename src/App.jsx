@@ -1,11 +1,8 @@
 import "./App.css";
-// eslint-disable-next-line import/extensions
-import logo from "./logo.svg";
 
 const App = () => (
   <div className="App">
     <header className="App-header">
-      <img alt="logo" className="App-logo" src={logo} />
       <p>
         Edit <code>src/App.js</code> and save to reload.
       </p>
@@ -17,6 +14,7 @@ const App = () => (
       >
         Learn React
       </a>
+      <p>My First React App</p>
     </header>
   </div>
 );
