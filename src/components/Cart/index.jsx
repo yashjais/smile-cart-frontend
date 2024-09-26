@@ -15,10 +15,11 @@ import { MRP, OFFER_PRICE } from "../constants";
 const Cart = () => {
   const [products, setProducts] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
-  const { cartItems, setSelectedQuantity } = useCartItemsStore();
+  const { cartItems, setSelectedQuantity } = useCartItemsStore.pick();
   const slugs = keys(cartItems);
   const totalMrp = cartTotalOf(products, MRP);
   const totalOfferPrice = cartTotalOf(products, OFFER_PRICE);
+
   const fetchCartProducts = async () => {
     try {
       const responses = await Promise.all(
@@ -48,6 +49,7 @@ const Cart = () => {
   useEffect(() => {
     fetchCartProducts();
   }, [cartItems]);
+
   if (isLoading) return <PageLoader />;
 
   if (isEmpty(products)) {
