@@ -1,8 +1,7 @@
 import { useState, useEffect } from "react";
 
 import productsApi from "apis/products";
-import { PageNotFound, Header } from "components/commons";
-import AddToCart from "components/commons/AddToCart";
+import { PageNotFound, Header, AddToCart } from "components/commons";
 import { Typography, Spinner } from "neetoui";
 import { append, isNotNil } from "ramda";
 import { useParams } from "react-router-dom";
@@ -32,7 +31,15 @@ const Product = () => {
     fetchProduct();
   }, []);
 
-  const { name, description, mrp, offerPrice, imageUrls, imageUrl } = product;
+  const {
+    name,
+    description,
+    mrp,
+    offerPrice,
+    imageUrl,
+    imageUrls,
+    availableQuantity,
+  } = product;
   const totalDiscounts = mrp - offerPrice;
   const discountPercentage = ((totalDiscounts / mrp) * 100).toFixed();
 
@@ -68,7 +75,7 @@ const Product = () => {
           <Typography className="font-semibold text-green-600">
             {discountPercentage}% off
           </Typography>
-          <AddToCart {...{ slug }} />
+          <AddToCart {...{ availableQuantity, slug }} />
         </div>
       </div>
     </div>
