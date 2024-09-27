@@ -1,7 +1,7 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 
-import productsApi from "apis/products";
 import { Header } from "components/commons";
+import { useFetchProducts } from "hooks/reactQuery/useProductsApi";
 import useDebounce from "hooks/useDebounce";
 import { Search } from "neetoicons";
 import { Input, Spinner, NoData } from "neetoui";
@@ -11,29 +11,14 @@ import withTitle from "utils/withTitle";
 import ProductListItem from "./ProductListItem";
 
 const ProductList = () => {
-  const [isLoading, setIsLoading] = useState(true);
-  const [products, setProducts] = useState([]);
   const [cartItems, setCartItems] = useState([]);
   const [searchKey, setSearchKey] = useState("");
+
   const debouncedSearchKey = useDebounce(searchKey);
 
-  useEffect(() => {
-    console.log("in the fetchproducts");
-    fetchProducts();
-  }, [debouncedSearchKey]);
-
-  const fetchProducts = async () => {
-    try {
-      const { products } = await productsApi.fetch({
-        searchTerm: debouncedSearchKey,
-      });
-      setProducts(products);
-    } catch (error) {
-      console.log("An error occurred:", error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  const { data: { products = [] } = {}, isLoading } = useFetchProducts({
+    searchTerm: debouncedSearchKey,
+  });
 
   const toggleIsInCart = slug =>
     setCartItems(prevCartItems =>
