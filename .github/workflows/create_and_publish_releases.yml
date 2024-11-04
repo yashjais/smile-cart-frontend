@@ -20,11 +20,11 @@ jobs:
           labels=("${{ join(github.event.pull_request.labels.*.name, ' ') }}")
 
           if [[ "${labels[@]}" == *patch* ]]; then
-            echo "::set-output name=RELEASE_TYPE::patch"
+            echo "RELEASE_TYPE=patch" >> $GITHUB_OUTPUT
           elif [[ "${labels[@]}" == *minor* ]]; then
-            echo "::set-output name=RELEASE_TYPE::minor"
+            echo "RELEASE_TYPE=minor" >> $GITHUB_OUTPUT
           elif [[ "${labels[@]}" == *major* ]]; then
-            echo "::set-output name=RELEASE_TYPE::major"
+            echo "RELEASE_TYPE=major" >> $GITHUB_OUTPUT
           fi
 
       - name: Checkout the repository
