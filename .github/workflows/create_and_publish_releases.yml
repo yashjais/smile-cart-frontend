@@ -14,6 +14,13 @@ jobs:
       contains(github.event.pull_request.labels.*.name, 'minor') ||
       contains(github.event.pull_request.labels.*.name, 'major') ) }}
     steps:
+      - name: Debug Event Info
+        run: |
+          echo "Event name: ${{ github.event_name }}"
+          echo "Action: ${{ github.event.action }}"
+          echo "PR merged: ${{ github.event.pull_request.merged }}"
+          echo "Labels: ${{ join(github.event.pull_request.labels.*.name, ' ') }}"
+
       - name: Determine release type
         id: release-type
         run: |
@@ -29,11 +36,14 @@ jobs:
 
       - name: Checkout the repository
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # This ensures we have the full git history
 
       - name: Setup git user
         run: |
           git config user.name "Yash jaiswal"
           git config user.email "jais.yash01@gmail.com"
+
       - name: Setup NodeJS LTS version
         uses: actions/setup-node@v4
         with:
@@ -44,6 +54,11 @@ jobs:
 
       - name: Generate production build
         run: yarn build
+
+      - name: Show current version
+        run: |
+          echo "Current version from package.json:"
+          node -p "require('./package.json').version"
 
       - name: Prefix version tag with "v"
         run: yarn config set version-tag-prefix "v"
@@ -75,12 +90,28 @@ jobs:
       #   working-directory: ./dist
       #   run: yarn version --new-version ${{ steps.next-version.outputs.VERSION }} --no-git-tag-version
 
+      # - name: Bump version in package.json
+      #   run: yarn version --new-version ${{ steps.release-type.outputs.RELEASE_TYPE }}
+
+      # - name: Bump version in package.json in dist folder
+      #   working-directory: ./dist
+      #   run: yarn version --new-version ${{ steps.release-type.outputs.RELEASE_TYPE }} --no-git-tag-version
+
       - name: Bump version in package.json
-        run: yarn version --new-version ${{ steps.release-type.outputs.RELEASE_TYPE }}
+        run: |
+          echo "Bumping version with type: ${{ steps.release-type.outputs.RELEASE_TYPE }}"
+          yarn version --new-version ${{ steps.release-type.outputs.RELEASE_TYPE }}
+          echo "New version after bump:"
+          node -p "require('./package.json').version"
 
       - name: Bump version in package.json in dist folder
         working-directory: ./dist
-        run: yarn version --new-version ${{ steps.release-type.outputs.RELEASE_TYPE }} --no-git-tag-version
+        run: |
+          echo "Current version in dist folder:"
+          node -p "require('./package.json').version"
+          yarn version --new-version ${{ steps.release-type.outputs.RELEASE_TYPE }} --no-git-tag-version
+          echo "New version in dist folder after bump:"
+          node -p "require('./package.json').version"
 
       - name: Get the package version from package.json
         uses: tyankatsu0105/read-package-version-actions@5aad2bb630a577ee4255546eb3ee0593df68f6ca
