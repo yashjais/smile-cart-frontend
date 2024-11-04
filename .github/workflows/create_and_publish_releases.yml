@@ -45,6 +45,9 @@ jobs:
       - name: Setup the project
         run: yarn install
 
+      - name: Generate production build
+        run: yarn build
+
       - name: Prefix version tag with "v"
         run: yarn config set version-tag-prefix "v"
 
