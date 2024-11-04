@@ -29,14 +29,11 @@ jobs:
 
       - name: Checkout the repository
         uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
 
       - name: Setup git user
         run: |
           git config user.name "Yash jaiswal"
           git config user.email "jais.yash01@gmail.com"
-
       - name: Setup NodeJS LTS version
         uses: actions/setup-node@v4
         with:
@@ -54,36 +51,36 @@ jobs:
       - name: Disable Git commit hooks
         run: git config core.hooksPath /dev/null
 
-      - name: Get next version
-        id: next-version
-        run: |
-          current_version=$(node -p "require('./package.json').version")
-          if [[ "${{ steps.release-type.outputs.RELEASE_TYPE }}" == "patch" ]]; then
-            next_version=$(npm version patch --no-git-tag-version)
-          elif [[ "${{ steps.release-type.outputs.RELEASE_TYPE }}" == "minor" ]]; then
-            next_version=$(npm version minor --no-git-tag-version)
-          elif [[ "${{ steps.release-type.outputs.RELEASE_TYPE }}" == "major" ]]; then
-            next_version=$(npm version major --no-git-tag-version)
-          fi
-          # Remove the 'v' prefix if present
-          next_version=${next_version#v}
-          echo "VERSION=$next_version" >> $GITHUB_OUTPUT
-          # Reset the version in package.json
-          npm version $current_version --no-git-tag-version
-
-      - name: Bump version in package.json
-        run: yarn version --new-version ${{ steps.next-version.outputs.VERSION }}
-
-      - name: Bump version in package.json in dist folder
-        working-directory: ./dist
-        run: yarn version --new-version ${{ steps.next-version.outputs.VERSION }} --no-git-tag-version
+      # - name: Get next version
+      #   id: next-version
+      #   run: |
+      #     current_version=$(node -p "require('./package.json').version")
+      #     if [[ "${{ steps.release-type.outputs.RELEASE_TYPE }}" == "patch" ]]; then
+      #       next_version=$(npm version patch --no-git-tag-version)
+      #     elif [[ "${{ steps.release-type.outputs.RELEASE_TYPE }}" == "minor" ]]; then
+      #       next_version=$(npm version minor --no-git-tag-version)
+      #     elif [[ "${{ steps.release-type.outputs.RELEASE_TYPE }}" == "major" ]]; then
+      #       next_version=$(npm version major --no-git-tag-version)
+      #     fi
+      #     # Remove the 'v' prefix if present
+      #     next_version=${next_version#v}
+      #     echo "VERSION=$next_version" >> $GITHUB_OUTPUT
+      #     # Reset the version in package.json
+      #     npm version $current_version --no-git-tag-version
 
       # - name: Bump version in package.json
-      #   run: yarn version --new-version ${{ steps.release-type.outputs.RELEASE_TYPE }}
+      #   run: yarn version --new-version ${{ steps.next-version.outputs.VERSION }}
 
       # - name: Bump version in package.json in dist folder
       #   working-directory: ./dist
-      #   run: yarn version --new-version ${{ steps.release-type.outputs.RELEASE_TYPE }} --no-git-tag-version
+      #   run: yarn version --new-version ${{ steps.next-version.outputs.VERSION }} --no-git-tag-version
+
+      - name: Bump version in package.json
+        run: yarn version --new-version ${{ steps.release-type.outputs.RELEASE_TYPE }}
+
+      - name: Bump version in package.json in dist folder
+        working-directory: ./dist
+        run: yarn version --new-version ${{ steps.release-type.outputs.RELEASE_TYPE }} --no-git-tag-version
 
       - name: Get the package version from package.json
         uses: tyankatsu0105/read-package-version-actions@5aad2bb630a577ee4255546eb3ee0593df68f6ca
